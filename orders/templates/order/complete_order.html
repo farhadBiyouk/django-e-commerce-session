@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Complete Checkout{% endblock %}
+{% block content %}
+<div class="section">
+    <!-- container -->
+    <div class="container">
+        <!-- row -->
+        <div class="row">
+
+            <div class="col-md-7">
+                <!-- Billing Details -->
+                <!-- /Billing Details -->
+                <div class=" order-details">
+                    <div class="section-title text-center">
+                        <h3 class="title">Your Order</h3>
+
+                    </div>
+                    <div>{{ order.first_name }} {{ order.last_name }} thanks for buy</div>
+                    <div class="order-summary">
+                        <div class="order-col">
+
+                        </div>
+                        <div class="order-products">
+                            <div class="order-col">
+
+                            </div>
+                        </div>
+                        <div class="order-col">
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order notes -->
+                <div class="order-notes">
+
+                </div>
+                <!-- /Order notes -->
+            </div>
+
+            <!-- Order Details -->
+
+            <!-- /Order Details -->
+        </div>
+        <!-- /row -->
+    </div>
+    <!-- /container -->
+</div>
+{% endblock %}

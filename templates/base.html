@@ -92,7 +92,7 @@
                         <!-- Cart -->
                         <div class="dropdown">
                             {% if request.session.cart %}
-                            <a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
+                            <a class="dropdown-toggle">
                                 <i class="fa fa-shopping-cart"></i>
                                 <div class="qty">{{ cart_count|length }}</div>
                                 <span> <a href="{% url 'cart:cart-detail' %}">Your Cart</a></span>
