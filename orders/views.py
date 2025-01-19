@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 
 from orders.forms import CreateOrderForm
 from orders.models import OrderItem
+from orders.tasks import notify_create_order
 from cart.cart import Cart
 
 
@@ -16,6 +17,7 @@ def create_order(request):
 				                         price=item['price'])
 			
 			cart.clear()
+			notify_create_order.delay(order.id)
 			return render(request, 'order/complete_order.html', {'order': order})
 	else:
 		form = CreateOrderForm()
