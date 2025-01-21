@@ -1,0 +1,91 @@
+version: '3.9'
+
+services:
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:latest
+    ports:
+      - "5672:5672"
+    networks:
+      - main
+    restart: on-failure
+
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    entrypoint:
+      - POSTGRES_DB=
+      - POSTGRES_USER=
+      - POSTGRES_PASSWORD=
+    networks:
+      - main
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgres/data
+    restart: on-failure
+
+
+  celery-worker:
+    container_name: celery_worker
+    command: "celery -A core worker -l INFO"
+    depends_on:
+      - app
+      - postgres
+      - rabbitmq
+    image: app-image
+    environment:
+        - C_FORCE_ROOT="true"
+    networks:
+        - main
+    restart: on-failure
+
+  app:
+    container_name: django-e-commerce
+    build: .
+    command: sh -c "python manage.py migrate && gunicorn core:wsgi -b 0.0.0.0:8000"
+    expose:
+      - "8000"
+    volumes:
+      - .:/app
+    networks:
+      - main
+    depends_on:
+      - postgres
+      - rabbitmq
+    restart: on-failure
+
+  nginx:
+    container_name: nginx
+    image: nginx:latest
+    depends_on:
+      - app
+    networks:
+      - main
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:etc/nginx/nginx.conf
+      - static-data:/app/static
+      - media-data:/app/media
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - main
+    volumes:
+      - redis-ca:/redis/data
+
+networks:
+  main:
+
+
+volumes:
+  postgres_data:
+  static-data:
+  media-data:
+  redis-ca:
+
