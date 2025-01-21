@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from django.utils.translation import gettext_lazy as _
 
 from django.conf.global_settings import STATICFILES_DIRS, EMAIL_BACKEND
 
@@ -49,6 +50,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
 	'django.middleware.security.SecurityMiddleware',
 	'django.contrib.sessions.middleware.SessionMiddleware',
+	'django.middleware.locale.LocaleMiddleware',
 	'django.middleware.common.CommonMiddleware',
 	'django.middleware.csrf.CsrfViewMiddleware',
 	'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -83,8 +85,12 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
 	'default': {
-		'ENGINE': 'django.db.backends.sqlite3',
-		'NAME': BASE_DIR / 'db.sqlite3',
+		'ENGINE': 'django.db.backends.postgresql',
+		'NAME': 'shop',
+		'USER': 'postgres',
+		'PASSWORD': 'pasopish0066@#',
+		'HOST': 'localhost',
+		'PORT': 5432
 	}
 }
 
@@ -140,3 +146,9 @@ SESSION_CART_ID = 'cart'
 
 # email config
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# redis config
+
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379
+REDIS_DB = 1
