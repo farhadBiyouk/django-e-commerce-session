@@ -19,6 +19,9 @@ class Order(models.Model):
 	
 	def __str__(self):
 		return f'order {self.first_name} {self.last_name}'
+	
+	def get_total_cost(self):
+		return sum(item.get_cost() for item in self.items.all)
 
 
 class OrderItem(models.Model):
