@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 from shop.models import Product
 
 
@@ -27,6 +27,7 @@ class Order(models.Model):
 class OrderItem(models.Model):
 	order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
 	product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='order_items')
+	user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='order_user', null=True, blank=True)
 	quantity = models.PositiveIntegerField(default=1)
 	price = models.PositiveIntegerField()
 	
