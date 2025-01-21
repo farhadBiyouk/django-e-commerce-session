@@ -44,10 +44,32 @@
     {% endfor %}
     <tr>
         <td>Total</td>
-        <td colspan="4"></td>
+        <td colspan="5"></td>
         <td>{{ cart.get_total_price }}</td>
     </tr>
+    {%  if cart.coupon %}
+    <tr>
+        <td>Total</td>
+        <td colspan="5"></td>
+        <td><u>{{ cart.get_total_price }}</u></td>
+    </tr>
+    <tr>
+        <td>New Total</td>
+        <td>{{ cart.coupon.code }} Coupon</td>
+        <td>({{ cart.coupon.discount }}% off)</td>
+        <td colspan="3"></td>
+        <td>{{ cart.get_total_price_by_discount }}</td>
+    </tr>
+{% endif %}
     </tbody>
 </table>
+
+<hr>
+<h3>Coupon form</h3>
+<form action="{% url 'coupon:coupon-apply' %}" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-dark">Apply</button>
+</form><br><br><br>
 <a href="{% url 'order:create-order' %}" class="btn btn-success">Checkout</a>
 {% endblock %}

@@ -2,28 +2,33 @@ import csv
 
 from django.contrib import admin
 from django.http import HttpResponse
+from django.urls import reverse
+from django.utils.safestring import mark_safe
 
 from orders.models import Order, OrderItem, Product
 
 from datetime import datetime
 
 
+def order_detail(obj):
+	url = reverse('order:admin_order_detail', args=[obj.id])
+	return mark_safe(f'<a href="{url}">View</a>')
+
 def export_to_csv(modeladmin, request, queryset):
 	opts = modeladmin.model._meta
 	content_disposition = f'attachment; filename={opts.verbose_name}.csv'
 	response = HttpResponse(content_type='text/csv')
-	response['Content_Disposition'] = content_disposition
+	response['Content-Disposition'] = content_disposition
 	writer = csv.writer(response)
-	
-	fields = [field for field in opts.get_fields() if not field.many_to_many and not field.one_to_many]
-	
+	fields = [field for field in opts.get_fields() if not \
+	field.many_to_many and not field.one_to_many]
 	writer.writerow([field.verbose_name for field in fields])
-	
+	# Write data rows
 	for obj in queryset:
 		data_row = []
 		for field in fields:
 			value = getattr(obj, field.name)
-			if isinstance(value, datetime):
+			if isinstance(value,datetime):
 				value = value.strftime('%d/%m/%Y')
 			data_row.append(value)
 		writer.writerow(data_row)
@@ -42,7 +47,7 @@ class OrderItemAdmin(admin.TabularInline):
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
 	list_display = ['id', 'first_name', 'last_name', 'email', 'address', 'postal_code', 'city', 'created', 'updated',
-	                'paid']
+	                'paid', order_detail]
 	list_filter = ['created', 'updated', 'paid']
 	inlines = [OrderItemAdmin]
 	actions = [export_to_csv]

@@ -1,13 +1,18 @@
-from django.shortcuts import render, redirect
-from django.urls import reverse
-from django.contrib.auth.models import User
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 
 from orders.forms import CreateOrderForm
-from orders.models import OrderItem
+from orders.models import OrderItem, Order
 from orders.tasks import notify_create_order
 from cart.cart import Cart
 
+
+@staff_member_required
+def admin_order_detail(request, order_id):
+	order = get_object_or_404(Order, id=order_id)
+	return render(request,
+'admin/orders/order/detail.html',{'order': order})
 
 @login_required
 def create_order(request):

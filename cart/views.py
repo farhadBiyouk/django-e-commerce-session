@@ -6,6 +6,8 @@ from shop.models import Product
 from cart.cart import Cart
 from cart.forms import CartAddProductForm
 
+from coupon.forms import CouponForm
+
 
 @require_POST
 def cart_add(request, product_id):
@@ -37,4 +39,5 @@ def cart_detail(reqeust):
 				'override': True
 			}
 		)
-	return render(reqeust, 'cart/cart_detail.html', {'cart': cart})
+	form = CouponForm()
+	return render(reqeust, 'cart/cart_detail.html', {'cart': cart, 'form': form})
