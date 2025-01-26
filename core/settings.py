@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
+
 from django.utils.translation import gettext_lazy as _
 
 from django.conf.global_settings import STATICFILES_DIRS, EMAIL_BACKEND
@@ -22,12 +24,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-abanr(53r81tmfqhn-pjm9_xf(qz3(%qw)7cwafq+iq4&i$i2+'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS').split(' ')
 
 # Application definition
 
@@ -85,13 +87,13 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
 	'default': {
-		'ENGINE': 'django.db.backends.postgresql',
-		'NAME': 'shop',
-		'USER': 'postgres',
-		'PASSWORD': 'pasopish0066@#',
-		'HOST': 'postgres',
-		'PORT': 5432
-	}
+		"ENGINE":  os.environ.get("SQL_ENGIN"),
+        "NAME":  os.environ.get("SQL_DB"),
+		"USER": os.environ.get("SQL_USER"),
+		"PASSWORD": os.environ.get("SQL_PASSWORD"),
+		"HOST": os.environ.get("SQL_HOST"),
+		"PORT": os.environ.get("SQL_PORT")
+        }
 }
 
 # Password validation
@@ -149,6 +151,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # redis config
 
-REDIS_HOST = 'localhost'
-REDIS_PORT = 6379
-REDIS_DB = 1
+REDIS_HOST = os.environ.get('REDIS_HOST')
+REDIS_PORT = os.environ.get('REDIS_PORT')
+REDIS_DB = os.environ.get('REDIS_DB')
+
+CELERY_BROKER_URL='amqp://rabbitmq'

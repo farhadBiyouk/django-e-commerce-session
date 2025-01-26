@@ -1,91 +1,76 @@
 version: '3.9'
 
 services:
-  rabbitmq:
-    container_name: rabbitmq
-    image: rabbitmq:latest
-    ports:
-      - "5672:5672"
+  web:
+    build: .
+    container_name: web
+    command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
+    env_file:
+      - ./.env
+    expose:
+      - 8000
     networks:
       - main
-    restart: on-failure
+    depends_on:
+      - db
+    volumes:
+      - static_data:/app/static
+      - media_data:/app/media
 
-  postgres:
-    container_name: postgres
+  db:
     image: postgres:latest
-    entrypoint:
-      - POSTGRES_DB=
-      - POSTGRES_USER=
-      - POSTGRES_PASSWORD=
-    networks:
-      - main
+    container_name: db
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgres/data
+      - postgresql_data:/var/lib/postgresql/data
+
+    networks:
+      - main
+    environment:
+      - POSTGRES_DB=shop_django
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+    networks:
+      - main
+    depends_on:
+      - web
+
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - static_data:/app/static
+      - media_data:/app/media
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:latest
+    networks:
+      - main
+    ports:
+      - "5672:5672"
     restart: on-failure
-
-
-  celery-worker:
+  celery_worker:
     container_name: celery_worker
     command: "celery -A core worker -l INFO"
     depends_on:
-      - app
-      - postgres
+      - web
       - rabbitmq
-    image: app-image
+      - db
+    image: web-image
     environment:
-        - C_FORCE_ROOT="true"
+      - C_FORCE_ROOT="true"
     networks:
-        - main
+      - main
     restart: on-failure
-
-  app:
-    container_name: django-e-commerce
-    build: .
-    command: sh -c "python manage.py migrate && gunicorn core:wsgi -b 0.0.0.0:8000"
-    expose:
-      - "8000"
-    volumes:
-      - .:/app
-    networks:
-      - main
-    depends_on:
-      - postgres
-      - rabbitmq
-    restart: on-failure
-
-  nginx:
-    container_name: nginx
-    image: nginx:latest
-    depends_on:
-      - app
-    networks:
-      - main
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx.conf:etc/nginx/nginx.conf
-      - static-data:/app/static
-      - media-data:/app/media
-
-  redis:
-    container_name: redis
-    image: redis:latest
-    ports:
-      - "6379:6379"
-    networks:
-      - main
-    volumes:
-      - redis-ca:/redis/data
-
 networks:
   main:
 
-
 volumes:
-  postgres_data:
-  static-data:
-  media-data:
-  redis-ca:
-
+  postgresql_data:
+  static_data:
+  media_data:

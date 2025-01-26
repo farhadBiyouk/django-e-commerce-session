@@ -1,14 +1,14 @@
-FROM python:latest
+FROM python:alpine
 
 WORKDIR /app
 
-COPY requirements.txt /app/
 
-RUN pip install -U pip
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+COPY ./requirements.txt .
+
+RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-COPY . /app/
-
-EXPOSE 8000
-
-CMD ["qunicorn", "core:wsgi", ":8000"]
+COPY . .
